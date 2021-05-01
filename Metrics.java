@@ -4,7 +4,7 @@ public class Metrics {
 	private int nextAvail = 0;
 	boolean autoIncrease = false;
 	int increaseByX;
-	int totalTimers = timerArray.length;
+	//int totalTimers = timerArray.length;
 	
 	//Use this constructor if you don't want it to increase the array size
 	public Metrics(int initialTimers) {
@@ -18,13 +18,9 @@ public class Metrics {
 	}
 	
 	/* This method will pick the first available timer and returns it's id.
-	 * Throws an exception if there are none left (nextAvail == -1).
 	 * Calls findNextAvail() before returning id
 	 */
-	public int startTime() throws MetricsException{
-		if(nextAvail == -1) {
-			throw new MetricsException("No timers left!");
-		}
+	public int startTime() {
 		timerArray[nextAvail] = System.nanoTime();
 		int idUsed = nextAvail;
 		findNextAvail();
@@ -32,17 +28,9 @@ public class Metrics {
 	}
 	
 	/* This method allows you to specify which timer it should use by id.
-	 * It will throw an error if the timer is already in use or the id is not in range.
 	 * Calls findNextAvail if the id specified is equal to nextAvail
 	 */
-	public void startTime(int id) throws MetricsException {
-		try {
-			if(timerArray[id] != 0) {
-				throw new MetricsException("Timer " + id + " already in use!");
-			}
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new MetricsException(id + " is not between 0 and " + (timerArray.length - 1));
-		}
+	public void startTime(int id) {
 		if(id == nextAvail) {
 			findNextAvail();
 		}
@@ -50,21 +38,17 @@ public class Metrics {
 	}
 	
 	/* This method will return the time in nanoseconds from when the timer was started to when this method was called.
-	 * It will throw an error when the timer is not in use or the id is not in range.
 	 * Sets nextAvail to the id if it's lower than nextAvail
 	 */
-	public long endTime(int id) throws MetricsException {
+	public long endTime(int id) {
 		long time = System.nanoTime();
-		try {
-			if(timerArray[id] == 0) {
-				throw new MetricsException("Timer " + id + " is not in use!");
-			}
-		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new MetricsException(id + " is not between 0 and " + (timerArray.length - 1));
-		}
 		time -= timerArray[id];
 		timerArray[id] = 0;
-		nextAvail = id < nextAvail ? id : nextAvail;
+		if(nextAvail == -1) {
+			nextAvail = id;
+		} else {
+			nextAvail = id < nextAvail ? id : nextAvail;
+		}
 		return time;
 	}
 	
